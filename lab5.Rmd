@@ -1,0 +1,85 @@
+---
+title: "Lab 5"
+author: "Chen Jin"
+date: "5/24/2018"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+library(dplyr)
+```
+
+#Q1
+```{r error=TRUE}
+# function: my_mult_table
+# generate standard multiplication tables 2-20
+# clear the workspace
+rm(list=ls())
+
+my_mult_table <- function(x, y){
+  if(!is.numeric(x) || !is.numeric(y)) stop("Error: argument is not numeric")
+  x <- as.integer(x)
+  y <- as.integer(y)
+  if(x < 2 || x > 20) stop("Please choose a value between 2-20")
+  if(y < 2 || y > 20) stop("Please choose a value between 2-20")
+  warning(" function will convert supplied values to integer")
+  result <- tcrossprod(1:x, 1:y)
+  dimnames(result) <- list(1:x, 1:y)
+  return(result)
+}
+
+my_mult_table()
+my_mult_table(10, 20)
+my_mult_table(-8, 21)
+my_mult_table(TRUE, "BLUE")
+```
+
+#Q2
+```{r error=TRUE}
+my_max <- function(x){
+  if (!is.numeric(x) ) stop ("need a numeric vector") 
+  x.max <- x[1]
+  for(i in x){
+    if(i > x.max) x.max <- i}
+return(x.max)
+}
+
+
+set.seed(18)
+testv <- sample(1:1000,100) 
+summary(testv) 
+
+my_max(testv)
+my_max(-testv)
+my_max(letters)
+my_max(rep(c(TRUE, FALSE), 50))
+my_max(iris)
+```
+
+#Q3
+```{r}
+#a
+replicate (1000, (6 %in% sample(1:6,  4,replace = TRUE))) %>% table() %>% prop.table()
+
+replicate (10000, (6 %in% sample(1:6,  4,replace = TRUE))) %>% table() %>% prop.table()
+
+replicate (100000, (6 %in% sample(1:6,  4,replace = TRUE))) %>% table() %>% prop.table()
+
+#b
+sim <- replicate(1000, {
+  sum(rowSums(matrix(sample(1:6, 48, replace = T), 24, 2)) == 12) >= 1
+})
+prop.table(table(sim))
+
+sim <- replicate(10000, {
+  sum(rowSums(matrix(sample(1:6, 48, replace = T), 24, 2)) == 12) >= 1
+})
+prop.table(table(sim))
+
+sim <- replicate(100000, {
+  sum(rowSums(matrix(sample(1:6, 48, replace = T), 24, 2)) == 12) >= 1
+})
+prop.table(table(sim))
+```
+
