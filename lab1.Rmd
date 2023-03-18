@@ -1,0 +1,111 @@
+---
+title: "Lab 1"
+author: "Chen Jin"
+date: "4/18/2018"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+```{r}
+library(plyr)
+library(dplyr)
+```
+
+
+# Q1
+### A. 
+```{r}
+library(haven)
+RN08 <- read_sav("~/Downloads/RN08_CNTY_data.sav")
+dim(RN08)
+A.1 <- (RN08[,c("AGE_GP", "RACE_GP", "PREP_SUM_PUF", "MAR_CHLD", "TOTSAL", "TOTRNHRS_YR")])
+head(A.1)
+```
+
+### B.
+```{r}
+library(foreign)
+USAexports <- read.dta("~/Downloads/exp06_con.dta")
+glimpse(USAexports)
+summary(USAexports[c("quantity","value")])
+B.1<-(USAexports[c("quantity","value")])
+save(B.1, file="B.1.RData")
+```
+
+### C.
+```{r}
+USAimports <- read_sas("~/Downloads/imp06_con.sas7bdat")
+dim(USAimports)
+head(USAimports[order(USAimports$GVALUE, decreasing = T), c("COUNTRY","GVALUE")],10)
+## SD_ARAB had the highest valuation. The actual value of the valuation is 2906621863.
+USAimports$COUNTRY[USAimports$GVALUE==max(USAimports$GVALUE)]
+max(USAimports$GVALUE)
+```
+
+
+### D.
+```{r}
+course <- read.table("http://www.gbcnv.edu/bookstore/2018-Spring.txt", sep = "\t", header = F, stringsAsFactors = F, quote = "")
+head(course)
+course <- course[,c(-1,-5,-9,-12,-13)]
+dim(course)
+```
+
+### E.
+```{r}
+API <- read.dbf("~/Downloads/14avgdb.dbf", as.is = F)
+dim(API)
+sum(sapply(API,is.factor))
+```
+
+# Q2
+```{r}
+load(url("http://www.stat.ucla.edu/~vlew/datasets/ucpay2016.RData"))
+save(ucpay,file="ucpay2016.RData")
+head(ucpay)
+```
+
+# Q3
+### A.
+```{r}
+write.csv(USAimports, file="USAimports.csv",row.names = F)
+```
+
+### B.1
+```{r}
+names(course) <-c("dept","coursenum", "title", "room", "last", "first", "enrolled", "capacity")
+head(course)
+```
+### B.2
+```{r}
+head(course[order(course$capacity, decreasing = T), c("dept","coursenum", "last", "capacity")],3)
+```
+
+### C.
+```{r}
+library(plyr)
+BBmodel <- lm(r ~ ab + hr, data = baseball)
+summary(BBmodel)
+BBmodel[1]
+BBmodel["coefficients"]
+```
+
+### D.1
+```{r}
+a=nrow(course)
+D1<-course[1:(0.7*a),]
+D2<-course[(0.7*a):a+1,]
+dim(D1)
+dim(D2)
+```
+### D.2
+```{r}
+D3<-course[,1:3]
+D4<-course[,4:8]
+dim(D3)
+dim(D4)
+```
+
