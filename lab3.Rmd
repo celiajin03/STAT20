@@ -1,0 +1,87 @@
+---
+title: "Lab 3"
+author: "Chen Jin"
+date: "5/3/2018"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+```{r}
+library(knitr) 
+library(tidyverse)
+library(lubridate)
+library(haven) 
+library(foreign) 
+```
+
+
+# Q1
+```{r}
+load(url("http://www.stat.ucla.edu/~vlew/datasets/spending1218.RData"))
+#A
+Spend$ZIP<-str_sub(Spend$ZIP,1,5)%>%as.numeric()
+#B
+Spend<-na.omit(Spend)
+Spend$TOTAL<-apply(Spend[,1:7],1, sum)%>%as.vector()
+#C
+sz<-merge(Spend,zipraceincome,by="ZIP")
+sz[1:6,1:8]
+dim(sz)
+#D
+sz[order(sz$TOTAL,decreasing = T)[1:10],c("ZIP", "MEDINC","TOTPOP","TOTAL")]
+sz[order(sz$TOTAL)[1:10],c("ZIP", "MEDINC","TOTPOP","TOTAL")]
+median(sz$MEDINC,na.rm=T)
+median(sz$TOTAL,na.rm=T)
+# The city spends money differently based on different zipcode. It spends most on 90012 district and least on 90270 district.
+```
+
+# Q2
+```{r}
+#A
+CRIME2017 <- read_csv("~/Downloads/CRIME2017.csv", 
+    col_types = cols(`Time Occurred` = col_time(format = "%H%M")))
+weekdays(CRIME2017$`Date Occurred`)%>%table()%>%sort()
+#Friday
+
+#B
+hour(CRIME2017$`Time Occurred`[CRIME2017$`Crime Code Description`=="VEHICLE - STOLEN"])%>%table()%>%sort()
+#22:00
+
+hour(CRIME2017$`Time Occurred`[CRIME2017$`Crime Code Description`=="CRIMINAL HOMICIDE"])%>%table()%>%sort()
+#07:00
+
+hour1<-hour(CRIME2017$`Time Occurred`[CRIME2017$`Crime Code Description`=="VEHICLE - STOLEN"])%>%table()%>%as.data.frame()
+hour1[[1]][(which(hour1$Freq==0))]
+#no
+
+hour(CRIME2017$`Time Occurred`[CRIME2017$`Crime Code Description`=="CRIMINAL HOMICIDE"])%>%table()
+#no
+
+#C
+victim<-CRIME2017[which(CRIME2017$`Victim Age`>=18&CRIME2017$`Victim Age`<=22),]
+dim(victim)
+nrow(victim)/nrow(CRIME2017)
+
+vic<-table(CRIME2017$`Crime Code Description`,CRIME2017$`Victim Age`>=18&CRIME2017$`Victim Age`<=22)%>%prop.table(margin = 1)
+rownames(vic)[which.max(vic[,2])]
+```
+
+#Q3
+```{r}
+library(XML)
+library(dplyr)
+junk <- readHTMLTable("http://online.wsj.com/public/resources/documents/info-Salaries_for_Colleges_by_Region-sort.html",stringsAsFactors=FALSE)[[7]]
+
+#A
+factor(str_replace_all(junk$Region,"Â",""),levels=c("Northeastern","Southern","Midwestern","Western","California"))%>%table()
+#B
+junk$x<- str_replace_all(junk[[4]],"\\$|,|Â","")%>%as.numeric()
+mean(junk$x,na.rm=T)
+median(junk$x,na.rm=T)
+IQR(junk$x,na.rm=T)
+sd(junk$x,na.rm=T)
+```
+
