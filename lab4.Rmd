@@ -1,0 +1,58 @@
+---
+title: "Lab 4"
+author: "Chen Jin"
+date: "5/13/2018"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+#Q1
+```{r}
+#apply
+library(haven)
+JFKYELLOW1 <- read_sav("~/Downloads/JFKYELLOW1.sav")
+JFKYELLOW1[,7:12]<-data.frame(lapply(JFKYELLOW1[,7:12], function(x) as.numeric(gsub("[^[:digit:]\\.]+","", x))))
+JFKYELLOW1$TOTAL<-apply(JFKYELLOW1[,7:12],1,sum)
+head(JFKYELLOW1[, 7:13])
+
+#dplyr
+library(dplyr)
+JFK2 <- read_sav("~/Downloads/JFKYELLOW1.sav")
+JFK2 %>%
+  mutate_at(.funs = function(x) as.numeric(gsub(pattern = "^\\$", "", x)), .vars = 7:12) %>% 
+  # mutate(total  = Reduce("+",.[7:12])) %>% 
+  mutate(total = rowSums(.[7:12])) %>% 
+  select(7:13)
+```
+
+#Q2
+```{r}
+#apply
+library(readr)
+Batting <- read_csv("https://raw.githubusercontent.com/chadwickbureau/baseballdatabank/master/core/Batting.csv")
+total<-tapply(Batting$HR, Batting$playerID,sum)
+bat.new<-data.frame(playerID = names(total))
+bat.new$total<-total
+Batting<-Batting[Batting$stint=="1", ]
+bat.new$years<-tapply(Batting$yearID, Batting$playerID,length)
+bat.new$perYear<-bat.new$total / bat.new$years
+print(tail(bat.new[with(bat.new, order(-total, years)),], 10), row.names = T)
+
+
+
+#dplyr
+Batting2 <- read_csv("https://raw.githubusercontent.com/chadwickbureau/baseballdatabank/master/core/Batting.csv")
+  
+bat2 <- Batting2 %>% 
+        group_by(playerID)%>%
+        summarize(total=sum(HR),
+               years=length(unique(yearID)),
+               perYear=total/years)%>% 
+        arrange(desc(total), years)
+
+tail(bat2, 10)
+```
+
