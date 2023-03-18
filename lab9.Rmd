@@ -1,0 +1,68 @@
+---
+title: "Lab 9"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+library(knitr) 
+library(tidyverse)
+library(lubridate)
+library(haven) 
+library(foreign) 
+```
+
+```{r}
+load(url("http://www.stat.ucla.edu/~vlew/SP18stat20/bb81.RData"))
+l<-bb81[[1]]
+s<-bb81[[2]]
+nrow(l)
+nrow(s)
+
+ls<-merge(l,s)
+nrow(ls)
+
+experience<-difftime("1986-07-01",ls$debut)
+median(experience)
+#wenti
+table(ls$birthMonth,ls$throws)%>%prop.table(margin = 1)%>%sort()
+table(ls$birthMonth,ls$throws=="L")%>%prop.table()%>%as.data.frame()%>%arrange(desc(Freq))
+
+ls[ls$bats=="L"&ls$throws=="L",]%>%nrow()/nrow(ls)
+
+ls$birthMonth[ls$throws=="L"]%>%table() %>% sort(decreasing = T)
+bbnew$birthMonth[bbnew$throws=="L"] %>% table() %>% sort(decreasing = T)
+player<-bbnew$playerID[bbnew$bats=="L"&bbnew$throws=="L"] %>% length()
+table(bbnew$bats=="L"&bbnew$throws=="L") %>% prop.table
+
+
+ls$salary<-str_replace_all(ls$salary,"\\$|,","")%>%as.numeric()
+cor(as.numeric(experience),ls$salary,use="complete.obs",method="pearson")%>%round(digit=2)
+```
+
+
+```{r}
+jfk <- read_sav("~/Downloads/JFKYELLOW1.sav")
+nrow(jfk)
+ncol(jfk)
+jfk$fare_amount<-str_replace_all(jfk$fare_amount,"\\$","")%>%as.numeric()
+mean(jfk$fare_amount)
+sd(jfk$fare_amount)
+#wenti
+cr<-jfk[jfk$payment_type=="1",]
+table(cr$payment_type,cr$tip_amount!="$0.00")%>%prop.table()
+
+cr$tip_amount<-str_replace_all(cr$tip_amount,"\\$","")%>%as.numeric()
+cor(cr$tip_amount,cr$trip_distance,use="complete.obs",method="pearson")
+```
+
+```{r}
+NYPD<- read_csv("~/Downloads/NYPD_MOTOR2015.csv")
+nrow(NYPD)
+ncol(NYPD)
+
+tapply(NYPD$`NUMBER OF MOTORIST INJURED`, hour(NYPD$TIME), sum)%>%sort()
+
+table(NYPD$BOROUGH, NYPD$`VEHICLE TYPE CODE 1`=="SPORT UTILITY / STATION WAGON")%>%prop.table(margin = 1)
+```
+
