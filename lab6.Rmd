@@ -1,0 +1,80 @@
+---
+title: "Lab 6"
+author: "Chen Jin"
+date: "5/30/2018"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+library(dplyr)
+library(readr)
+cholesterol <- read_csv("~/Downloads/cholesterol.csv")
+```
+
+#Q1
+```{r}
+nrow(cholesterol)
+summary(cholesterol)
+#Patient ID, GENDER, APOL, RS174548, RS4775401, HTN, CHD
+```
+#Q2
+```{r}
+mean(cholesterol$TG)
+median(cholesterol$TG)
+sd(cholesterol$TG)
+IQR(cholesterol$TG)
+```
+#Q3
+```{r}
+hist(cholesterol$TG)
+qqnorm(cholesterol$TG)
+qqline(cholesterol$TG,distribution = qnorm)
+#YES, the distribution of Serum triglycerides is approximately normal
+```
+#Q4
+```{r}
+boxplot(cholesterol$TG~cholesterol$GENDER)
+```
+
+#Q5
+```{r}
+cholesterol$BMI_CAT<-ifelse(cholesterol$BMI>=30,"obese",ifelse(cholesterol$BMI>=25,"overweight",ifelse(cholesterol$BMI>=18,"normal",NA)))
+```
+#Q6
+```{r}
+cholesterol$BMI_BIN<-ifelse(cholesterol$BMI<25,0,ifelse(cholesterol$BMI>=25,1,NA))
+table(cholesterol$BMI_BIN)%>%prop.table()
+#45.25% of patients are overweight or obese
+```
+#Q7
+```{r}
+tapply(cholesterol$TG, cholesterol$BMI_BIN, summary)
+```
+
+#Q8
+```{r}
+boxplot(cholesterol$TG~cholesterol$BMI_BIN)
+#YES, there appear to be an association between BMI and triglycerides
+```
+
+#Q9
+```{r}
+with(cholesterol, t.test(TG~BMI_BIN))
+#we should reject the null hypothesis 
+```
+#10 
+```{r}
+plot(cholesterol$TG,cholesterol$BMI)
+#Based on this plot, there appears to be an association between BMI and triglycerides. A scatterplot reveals that there is a positive relationship between BMI and triglycerides that was not revealed with a boxplot.
+```
+
+#Q11、12
+```{r}
+l<-lm(cholesterol$TG~cholesterol$BMI)
+summary(l)
+coef(l)
+#they are positively correlated
+#TG=15.44*BMI-208.50              
+plot(l)
+```
