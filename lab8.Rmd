@@ -1,0 +1,73 @@
+---
+title: "Lab 8"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+library(knitr) 
+library(tidyverse)
+library(lubridate)
+library(haven) 
+library(foreign) 
+```
+
+#Q1
+```{r}
+load("~/Downloads/bb102.RData")
+large<-bb102[1]%>%as.data.frame()
+nrow(large)
+small<-bb102[2]%>%as.data.frame()
+nrow(small)
+
+ls<-merge(large,small,by.x="player10.2.Player.ID",by.y ="salaries10.2.Player.ID")%>%as.data.frame()
+nrow(ls)
+
+experience<-difftime("2007-07-01",ls$player10.2.Debut)
+yr<-experience/365.25
+mean(yr,na.rm=T)%>%round(digit=2)
+ 
+ls$player10.2.Birth.Month[ls$player10.2.Bats=="B"]%>%as.character()%>%as.numeric()%>%table()%>%sort()%>%tail(n=1)
+
+lr<-ls[ls$player10.2.Bats=="L"&ls$player10.2.Throws=="R",]
+(nrow(lr)/nrow(ls))%>%round(digit=2)
+
+ls$salaries10.2.Salary<-str_replace_all(ls$salaries10.2.Salary,"\\$|,","")%>%as.numeric()
+cor(as.numeric(ls$experience),ls$salaries10.2.Salary,use="complete.obs",method="pearson")%>%round(digit=2)
+```
+
+#Q2
+```{r}
+ORDTaxi_Trips2 <- read_sas("~/Downloads/ORDTaxi_Trips2.sas7bdat", 
+    NULL)
+View(ORDTaxi_Trips2)
+nrow(ORDTaxi_Trips2)
+ncol(ORDTaxi_Trips2)
+
+fare<-str_replace_all(ORDTaxi_Trips2$fare,"\\$","")%>%as.numeric()
+fare
+IQR(fare,na.rm = T)%>%round(digit=2)
+sd(fare,na.rm = T)%>%round(digit=2)
+
+ORDTaxi_Trips2$paymenttype[ORDTaxi_Trips2$tips=="$0.00"]%>%table()%>%prop.table()
+
+credit<-ORDTaxi_Trips2[ORDTaxi_Trips2$paymenttype=="Credit Card",]
+credit$tips<-str_replace_all(credit$tips,"\\$","")%>%as.numeric()
+cor(credit$tips,credit$tripmiles,use="complete.obs",method="pearson")%>%round(digit=2)
+```
+
+#Q3
+```{r}
+CHICrimes2017 <- read_csv("~/Downloads/CHICrimes2017.csv", 
+    col_types = cols(DATE = col_datetime(format = "%m/%d/%Y %I:%M:%S %p")))
+View(CHICrimes2017)
+nrow(CHICrimes2017)
+ncol(CHICrimes2017)
+
+hour(CHICrimes2017$DATE[CHICrimes2017$PRIMARY_TYPE=="ASSAULT"])%>%table()%>%sort()%>%tail(n=1)
+
+CHICrimes2017$DISTRICT[CHICrimes2017$PRIMARY_TYPE=="HOMICIDE"]%>%table()%>%sort()%>%tail(n=1)
+```
+
+
+
