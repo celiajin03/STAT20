@@ -1,0 +1,78 @@
+---
+title: "Lab 2"
+author: "Chen Jin"
+date: "4/25/2018"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+```{r}
+library(readr)
+library(ggplot2)
+```
+
+
+# Q1
+```{r}
+csu <- read_table2("~/Downloads/CSU.dat.txt", col_names = FALSE)
+Year<-csu[[1]]
+Dollars<-csu[[3]]
+plot(Year,Dollars, type = "l", main="Cal State Undergraduate Resident Tuition and Fees 1992−2017",xlim=c(1992,2016),ylim=c(0,6000),col="red", las=2, xaxt = "n")
+axis(side = 1, at = seq(1992, 2017, 1),cex.axis=0.8)
+abline(h=median(Dollars),lty=3)
+```
+
+# Q2
+```{r}
+ND <- read_csv("http://www.stat.ucla.edu/~vlew/datasets/ND.csv")
+SF <- read_csv("http://www.stat.ucla.edu/~vlew/datasets/SF.csv")
+ND[7]<-(ND[6]*1.8) + 32
+colnames(ND)[7]<-"TFAVG"
+SF[7]<-(SF[6]*1.8) + 32
+colnames(SF)[7]<-"TFAVG"
+boxplot(ND$TFAVG~ND$MO, main = "Boxplot Example − Temperature Data",xlab="Month of the Year",ylab="Average Temp (Fahrenheit)",col=c(5), boxwex = 0.5)
+boxplot(SF$TFAVG~SF$MO, main = "Boxplot Example − Temperature Data",xlab="Month of the Year",ylab="Average Temp (Fahrenheit)",col=c(7),add=T,at = 1:12 + 0.3, boxwex = 0.5)
+legend("bottom", c("San Francisco","North Dakota"),inset=.02, fill=c(7,5))
+```
+
+# Q3
+```{r, fig.height = 8, fig.width = 6}
+yelp3 <- read_csv("http://www.stat.ucla.edu/~vlew/datasets/yelp3.csv")
+par(mfrow=c(3,1))
+hist(yelp3$stars[yelp3$categories.0=="Vegan"],main="Vegan Ratings", freq=FALSE, col="orange", xlab = "Yelp Rating",xlim = c(1, 5))
+hist(yelp3$stars[yelp3$categories.0=="Buffets"],main="Buffet Ratings", freq=FALSE, col="blue", xlab = "Yelp Rating",xlim = c(1, 5))
+hist(yelp3$stars[yelp3$categories.0=="Sports Bars"],main="Sports Bar Ratings", freq=FALSE, col="maroon", xlab = "Yelp Rating",xlim = c(1, 5))
+```
+
+# Q4
+### A
+```{r}
+library(ggplot2)
+pairs(~ poptotal+popasian+perchsd+percollege+percprof+percbelowpoverty, data = midwest, main = "Scatterplot Matrix of ggplot dataset midwest",cex.axis=0.8)
+```
+
+
+
+### B
+```{r}
+plot(midwest$percollege~midwest$perchsd, data=midwest,type="n",main="Plot of College degree on high school diploma with medians",xlab="perchsd",ylab="percollege")
+abc<-midwest$state
+points(midwest$percollege~midwest$perchsd,col=factor(midwest$state),pch=20,cex=0.5)
+legend("topleft", c("IL","IN","MI","OH","WI"),pch=20,col=c(1:5))
+abline(h=mean(midwest$percollege),col="red")
+abline(v=mean(midwest$perchsd),col="blue")
+```
+
+# Q5
+```{r}
+plot(Year,Dollars, type = "l", main="CSU Tutition 1992−2017",ylim=c(0,12000),ylab="in Dollars",col=4,las=2,xaxt = "n",cex.axis=0.8)
+axis(side = 1, at = seq(1992, 2017, 1),cex.axis=0.8)
+abline(h=median(Dollars),lwd=2)
+lines(csu[[1]],csu[[12]],lty=2, col=2,lwd=2)
+abline(h=median(csu[[12]]),lty=2,lwd=2)
+legend("center",c("Resident","Non−Resident"),col=c(4,2),lty=c(1,2),lwd=2)
+```
+
