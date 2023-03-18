@@ -1,0 +1,115 @@
+---
+title: "Lab 7"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+```{r}
+library(readr)
+library(lubridate)
+SeattleB <- read_csv("~/Downloads/SeattleB.csv", 
+    col_types = cols(Crime.Report.Date = col_datetime(format = "%m/%d/%Y %I:%M:%S %p"), 
+        First.Response.Date = col_datetime(format = "%m/%d/%Y %I:%M:%S %p")))
+
+diff<-as.numeric(difftime(SeattleB$Crime.Report.Date,SeattleB$First.Response.Date, units="mins"))
+mean(diff,is.na=T)
+
+SeattleB[,11]<-diff
+#wp<-SeattleB[SeattleB$Initial.Crime.Type=="WEAPONS CALLS"][11]
+
+mon<-month(SeattleB$Crime.Report.Date)
+max(mon, na.rm=TRUE)
+q<-SeattleB[SeattleB$Initial.Crime.Type=="WEAPONS CALLS",]
+diff<-as.numeric(difftime(q$Crime.Report.Date,q$First.Response.Date, units="mins"))
+mean(diff,is.na=T)
+
+a<-table(quarter(SeattleB$Crime.Report.Date))%>%as.data.frame()
+a[a[2]==max(a[2]),]
+
+a<-table(month(SeattleB$Crime.Report.Date))%>%as.data.frame()
+a[a[2]==max(a[2]),]
+```
+
+#Q3
+```{r}
+library(stringr)
+junk <- readLines("http://www.gutenberg.org/files/1342/1342-0.txt")
+
+junk2 <- unlist(strsplit(junk[36:13066], " "))
+
+junk2<-str_to_lower(str_replace_all(junk2,"[^[:alnum:]]", "") ) 
+str_count(junk2,"elizabeth") %>% sum
+str_count(junk2,"darcy") %>% sum
+
+
+str_count(junk2,"longbourn") %>% sum
+a<-table(junk2) %>% as.data.frame()
+tail(sort(table(junk2)), n=200)
+```
+
+```{r}
+library(dplyr)
+junk2 %>% select(junk2[1,]=="His")
+```
+
+
+
+#Q4
+```{r}
+
+cs <- read.csv("http://www.stat.ucla.edu/~vlew/datasets/countrystats.csv",
+
+                   stringsAsFactors=FALSE)
+
+countries <- read.csv("http://www.stat.ucla.edu/~vlew/datasets/countries.csv",
+
+               stringsAsFactors=FALSE)
+
+rice <- read.csv("http://www.stat.ucla.edu/~vlew/datasets/rice.csv",
+
+               stringsAsFactors=FALSE)
+
+names(rice)[1] <- "NAME"
+```
+
+```{r}
+merge(cs, rice ,by= "NAME",all=TRUE )
+merge(cs, countries, by= "NAME",all=TRUE )
+```
+
+#Q5
+```{r}
+library(XML)
+library(dplyr)
+library(stringr)
+junk <- readHTMLTable("http://online.wsj.com/public/resources/documents/info-Salaries_for_Colleges_by_Type-sort.html",
+                      stringsAsFactors=FALSE)[[7]]
+
+a<-junk %>% select("Starting Median Salary") %>% unlist()
+a<-as.numeric(str_replace_all(a, "\\$|,|Â", ""))
+median(a[1:19])
+median(a[20:39])
+median(a[40:86])
+median(a[87:94])
+median(a[95:269])
+junk$a<-a
+median(junk[junk[2]=="Ivy LeagueÂ",]$a,na.rm = T)
+
+
+a<-junk %>% select("Mid-Career 90th Percentile Salary") %>% unlist()
+a<-as.numeric(str_replace_all(a, "\\$|,|Â", ""))
+median(a[1:19],na.rm = T)
+median(a[20:39],na.rm = T)
+median(a[40:86],na.rm = T)
+median(a[87:94],na.rm = T)
+median(a[95:269],na.rm = T)
+    
+    
+#junk %>% select(c("School Type","Starting Median Salary")) %>% sort
+```
+
+
+
